@@ -12,6 +12,8 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 type App struct {
@@ -29,12 +31,13 @@ func New(logger *slog.Logger, config *config.Config) *App {
 }
 
 func (a *App) StartServer() error {
-	auth_controller := authcontroller.New(a.log)
+	auth_controller := authcontroller.New(a.log, &http.Client{Timeout: a.cfg.Timeout})
 
-	r := http.DefaultServeMux
+	r := mux.NewRouter()
 	r.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("pong"))
 	})
+
 	r.HandleFunc("/login", auth_controller.Login)
 	r.HandleFunc("/register", auth_controller.Register)
 
