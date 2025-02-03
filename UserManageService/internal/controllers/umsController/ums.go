@@ -214,7 +214,9 @@ func (ums *UserManageService) Insert(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ums *UserManageService) Update(w http.ResponseWriter, r *http.Request) {
-	ums.log.Info("/users (PUT) start process...")
+	ums.log.Info("/users/id (PUT) start process...")
+
+	id_s := mux.Vars(r)["id"]
 
 	var user_checker redhub.User
 	if err := json.NewDecoder(r.Body).Decode(&user_checker); err != nil {
@@ -225,7 +227,7 @@ func (ums *UserManageService) Update(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: тут получение jwt токена из запроса
 
-	req, err := http.NewRequest(http.MethodPut, "URL/users/login", r.Body)
+	req, err := http.NewRequest(http.MethodPut, "URL/users/"+id_s, r.Body)
 	if err != nil {
 		ums.log.Error("error of creating request:", sl.Err(err))
 		http.Error(w, "Failed to create request: "+err.Error(), http.StatusBadRequest)
@@ -249,7 +251,7 @@ func (ums *UserManageService) Update(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(resp.StatusCode)
-	ums.log.Info("/users (PUT) completed process")
+	ums.log.Info("/users/id (PUT) completed process")
 }
 
 func (ums *UserManageService) Delete(w http.ResponseWriter, r *http.Request) {
